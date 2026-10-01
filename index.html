@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AIM CONFIG PRO</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,sans-serif;
+  background:#080808;
+  color:#fff;
+  padding:20px;
+}
+
+.app{
+  max-width:430px;
+  margin:auto;
+}
+
+.header{
+  text-align:center;
+  padding:25px 10px;
+}
+
+.logo{
+  font-size:55px;
+  margin-bottom:8px;
+}
+
+h1{
+  font-size:24px;
+}
+
+.sub{
+  color:#999;
+  margin-top:6px;
+}
+
+.card{
+  background:#151515;
+  border:1px solid #292929;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:15px;
+}
+
+label{
+  display:block;
+  margin-bottom:9px;
+  font-weight:bold;
+}
+
+input[type="text"],
+select{
+  width:100%;
+  padding:13px;
+  border-radius:10px;
+  border:1px solid #333;
+  background:#202020;
+  color:#fff;
+  outline:none;
+}
+
+.range{
+  width:100%;
+  accent-color:#fff;
+}
+
+.value{
+  text-align:right;
+  color:#aaa;
+  margin-top:5px;
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:12px;
+  margin-top:10px;
+  background:#fff;
+  color:#000;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.btn.dark{
+  background:#252525;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.status{
+  text-align:center;
+  color:#aaa;
+  margin-top:14px;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="logo">🎯</div>
+    <h1>AIM CONFIG PRO</h1>
+    <div class="sub">Control & Sensitivity Editor</div>
+  </div>
+
+  <div class="card">
+    <label>Tên cấu hình</label>
+    <input id="name" type="text" value="AIM PRO">
+
+    <br><br>
+
+    <label>Thiết bị</label>
+    <select id="device">
+      <option>iPhone</option>
+      <option>Android</option>
+      <option>Tablet</option>
+    </select>
+  </div>
+
+  <div class="card">
+
+    <label>Độ nhạy tổng</label>
+    <input id="sensitivity"
+           class="range"
+           type="range"
+           min="1"
+           max="200"
+           value="100"
+           oninput="update()">
+    <div class="value" id="sensitivityValue">100</div>
+
+    <br>
+
+    <label>Độ mượt</label>
+    <input id="smooth"
+           class="range"
+           type="range"
+           min="1"
+           max="100"
+           value="75"
+           oninput="update()">
+    <div class="value" id="smoothValue">75</div>
+
+    <br>
+
+    <label>Kích thước nút điều khiển</label>
+    <input id="buttonSize"
+           class="range"
+           type="range"
+           min="20"
+           max="150"
+           value="80"
+           oninput="update()">
+    <div class="value" id="buttonSizeValue">80</div>
+
+    <br>
+
+    <label>Phản hồi cảm ứng</label>
+    <input id="touch"
+           class="range"
+           type="range"
+           min="1"
+           max="100"
+           value="85"
+           oninput="update()">
+    <div class="value" id="touchValue">85</div>
+
+  </div>
+
+  <div class="card">
+
+    <button class="btn" onclick="exportConfig()">
+      Xuất file cấu hình
+    </button>
+
+    <button class="btn dark" onclick="resetConfig()">
+      Đặt lại
+    </button>
+
+    <div class="status" id="status">
+      Sẵn sàng tạo cấu hình
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+function update(){
+
+  document.getElementById("sensitivityValue").textContent =
+    document.getElementById("sensitivity").value;
+
+  document.getElementById("smoothValue").textContent =
+    document.getElementById("smooth").value;
+
+  document.getElementById("buttonSizeValue").textContent =
+    document.getElementById("buttonSize").value;
+
+  document.getElementById("touchValue").textContent =
+    document.getElementById("touch").value;
+}
+
+function exportConfig(){
+
+  const config = {
+
+    app: "AIM CONFIG PRO",
+
+    name:
+      document.getElementById("name").value,
+
+    device:
+      document.getElementById("device").value,
+
+    settings: {
+
+      sensitivity:
+        Number(document.getElementById("sensitivity").value),
+
+      smooth:
+        Number(document.getElementById("smooth").value),
+
+      buttonSize:
+        Number(document.getElementById("buttonSize").value),
+
+      touchResponse:
+        Number(document.getElementById("touch").value)
+
+    },
+
+    note:
+      "Cấu hình điều khiển cá nhân, không can thiệp game."
+
+  };
+
+  const data =
+    JSON.stringify(config,null,2);
+
+  const blob =
+    new Blob([data],{type:"application/json"});
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+
+  a.download =
+    (config.name || "aim-config")
+    .replace(/[^a-z0-9_-]/gi,"_")
+    + ".json";
+
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+  document.getElementById("status").textContent =
+    "✓ Đã xuất cấu hình thành công";
+}
+
+function resetConfig(){
+
+  document.getElementById("name").value =
+    "AIM PRO";
+
+  document.getElementById("device").value =
+    "iPhone";
+
+  document.getElementById("sensitivity").value =
+    100;
+
+  document.getElementById("smooth").value =
+    75;
+
+  document.getElementById("buttonSize").value =
+    80;
+
+  document.getElementById("touch").value =
+    85;
+
+  update();
+
+  document.getElementById("status").textContent =
+    "Đã đặt lại cấu hình";
+}
+
+update();
+
+</script>
+
+</body>
+</html>
